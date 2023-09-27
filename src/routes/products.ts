@@ -15,4 +15,20 @@ router.get('/', async (req: Request, res: Response) => {
     }
   });
 
+  // Create a new product
+  router.post('/', async (req: Request, res: Response) => {
+    const product = new Product(req.body);
+
+    try {
+      const newProduct = await product.save();
+      res.status(201).json(newProduct);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+      }
+    }
+  });
+
+
+
 export default router;
