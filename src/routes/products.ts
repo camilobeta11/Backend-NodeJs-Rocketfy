@@ -65,4 +65,48 @@ router.delete('/:id', async (req: Request, res: Response) => {
   }
 });
 
+//  Search and filter products by specific criteria
+router.get('/search', async (req: Request, res: Response) => {
+  try {
+    const { price, stock, name } = req.query;
+    const filter: any = {};
+
+    if (price) {
+      const parsedPrice = parseFloat(price as string);
+      if (!isNaN(parsedPrice)) {
+        filter.price = { $lte: parsedPrice };
+      } else {
+        res.json([]);
+        return;
+      }
+    }
+
+    if (stock) {
+      const parsedStock = parseFloat(stock as string);
+      if (!isNaN(parsedStock)) {
+        filter.stock = { $lte: parsedStock };
+      } else {
+        res.json([]);
+        return;
+      }
+    }
+
+    if (name) {
+      filter.name = { $regex: name as string, $options: 'i' };
+    } else {
+      res.json([]);
+      return;
+    }
+
+    const products = await Product.find(filter);
+
+    res.json(products);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+});
+
+
 export default router;
