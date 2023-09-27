@@ -1,0 +1,10 @@
+node_modules/
+.env
+dist/
+build/
+out/
+*.log
+*.tmp
+.env.local
+.vscode/
+.idea/
