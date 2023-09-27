@@ -10,7 +10,7 @@ router.get('/', async (req: Request, res: Response) => {
     res.json(products);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   }
 });
@@ -24,12 +24,12 @@ router.post('/', async (req: Request, res: Response) => {
     res.status(201).json(newProduct);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   }
 });
 
-// Update a product
+// Update a product for id
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const productId = req.params.id;
@@ -43,11 +43,26 @@ router.put('/:id', async (req: Request, res: Response) => {
     res.json(updatedProduct);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   }
 });
 
+// Delete a product for id
+router.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    const productId = req.params.id;
+    const deletedProduct = await Product.findByIdAndRemove(productId);
+    if (!deletedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
 
+    res.json({ message: 'Product disposed of correctly' });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+});
 
 export default router;
