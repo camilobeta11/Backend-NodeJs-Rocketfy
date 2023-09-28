@@ -18,12 +18,13 @@ Asegúrate de tener instalado Node.js y MongoDB en tu sistema antes de ejecutar 
    ```bash
    npm install
 
-3. Crea un .env y agrega para correr localmente
+3. Crea un .env y agrega para correr localmente:
 
- ```bash
-   MONGODB_URI=mongodb://localhost/rocketfy para corre
+    ```bash
+   MONGODB_URI=mongodb://localhost/rocketfy
 
 4. Corre con:
+
    ```bash
     npm run build-node
    
