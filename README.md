@@ -1,4 +1,4 @@
-# backend-NodeJs-Rocketfy
+# Backend-NodeJs-Rocketfy
 
 Este es un proyecto de ejemplo que utiliza Node.js con Express y MongoDB para crear una API que permite buscar y filtrar productos por diferentes criterios, como precio, stock y nombre.
 
