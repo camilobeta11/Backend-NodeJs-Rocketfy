@@ -4,10 +4,26 @@ import Product from '../models/product';
 const router = express.Router();
 
 // Get all products
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const pageParam: any = req.query.page;
+    const pageSizeParam: any = req.query.pageSize;
+
+    const page = parseInt(pageParam, 10) || 1;
+    const pageSize = parseInt(pageSizeParam, 10) || 5;
+
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / pageSize);
+
+    const products = await Product.find()
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    res.json({
+      currentPage: page,
+      totalPages: totalPages,
+      products: products,
+    });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -16,7 +32,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Get product
-router.get('/:id', async (req, res) => {
+router.get('/filter/:id', async (req: Request, res: Response) => {
   try {
     const productId = req.params.id;
     const product = await Product.findById(productId);
@@ -55,6 +71,25 @@ router.put('/:id', async (req: Request, res: Response) => {
     const updatedProduct = await Product.findByIdAndUpdate(productId, updatedProductData, {
       new: true
     });
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    if (updatedProductData.hasOwnProperty('price')) {
+      updatedProduct.priceHistory.push({
+        price: updatedProduct.price,
+        date: new Date(),
+      });
+      updatedProduct.price = updatedProductData.price;
+    }
+
+    if (updatedProductData.hasOwnProperty('stock')) {
+      updatedProduct.stockHistory.push({
+        stock: updatedProduct.stock,
+        date: new Date(),
+      });
+      updatedProduct.stock = updatedProductData.stock;
+    }
     if (!updatedProduct) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -125,6 +160,5 @@ router.get('/search', async (req: Request, res: Response) => {
     }
   }
 });
-
 
 export default router;
