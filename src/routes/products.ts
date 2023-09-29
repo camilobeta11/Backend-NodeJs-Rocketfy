@@ -15,6 +15,24 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
+// Get product
+router.get('/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not foun' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+});
+
 // Create a new product
 router.post('/', async (req: Request, res: Response) => {
   const product = new Product(req.body);
