@@ -4,7 +4,7 @@ Este es un proyecto de ejemplo que utiliza Node.js con Express y MongoDB para cr
 
 ## Requisitos previos
 
-Asegúrate de tener instalado Node.js y MongoDB en tu sistema antes de ejecutar este proyecto. El proyecto esta para ejecución en entorno local, puede utilizar Robo 3T para visualizar los datos de MongoDB.
+Asegúrate de tener instalado Node.js y MongoDB en tu sistema antes de ejecutar este proyecto. El proyecto esta para ejecución en entorno local, puedes utilizar Robo 3T para visualizar los datos de MongoDB.
 
 ## Configuración
 
