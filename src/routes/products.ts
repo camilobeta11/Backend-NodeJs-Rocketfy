@@ -9,8 +9,8 @@ router.get('/', async (req, res) => {
     const pageParam: any = req.query.page;
     const pageSizeParam: any = req.query.pageSize;
 
-    const page = parseInt(pageParam, 10) || 1;
-    const pageSize = parseInt(pageSizeParam, 10) || 5;
+    const page = parseInt(pageParam,5) || 1;
+    const pageSize = parseInt(pageSizeParam, 5) || 5;
 
     const totalProducts = await Product.countDocuments();
     const totalPages = Math.ceil(totalProducts / pageSize);
@@ -121,36 +121,21 @@ router.delete('/:id', async (req: Request, res: Response) => {
 //  Search and filter products by specific criteria
 router.get('/search', async (req: Request, res: Response) => {
   try {
-    const { price, stock, name } = req.query;
+    const { stock, tags, name } = req.query;
     const filter: any = {};
 
-    if (price) {
-      const parsedPrice = parseFloat(price as string);
-      if (!isNaN(parsedPrice)) {
-        filter.price = { $lte: parsedPrice };
-      } else {
-        res.json([]);
-        return;
-      }
+    if (stock) {
+        filter.stock = { $lte: stock };
     }
 
-    if (stock) {
-      const parsedStock = parseFloat(stock as string);
-      if (!isNaN(parsedStock)) {
-        filter.stock = { $lte: parsedStock };
-      } else {
-        res.json([]);
-        return;
+    if (tags) {
+      const parsedTags = Array.isArray(tags) ? tags : [tags];
+      filter.tags = { $in: parsedTags };
       }
-    }
 
     if (name) {
       filter.name = { $regex: name as string, $options: 'i' };
-    } else {
-      res.json([]);
-      return;
     }
-
     const products = await Product.find(filter);
 
     res.json(products);
