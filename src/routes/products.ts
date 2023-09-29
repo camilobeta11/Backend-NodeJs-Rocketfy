@@ -4,10 +4,44 @@ import Product from '../models/product';
 const router = express.Router();
 
 // Get all products
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const pageParam: any = req.query.page;
+    const pageSizeParam: any = req.query.pageSize;
+
+    const page = parseInt(pageParam,5) || 1;
+    const pageSize = parseInt(pageSizeParam, 5) || 5;
+
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / pageSize);
+
+    const products = await Product.find()
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    res.json({
+      currentPage: page,
+      totalPages: totalPages,
+      products: products,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+});
+
+// Get product
+router.get('/filter/:id', async (req: Request, res: Response) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not foun' });
+    }
+
+    res.json(product);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -40,6 +74,25 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (!updatedProduct) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    if (updatedProductData.hasOwnProperty('price')) {
+      updatedProduct.priceHistory.push({
+        price: updatedProduct.price,
+        date: new Date(),
+      });
+      updatedProduct.price = updatedProductData.price;
+    }
+
+    if (updatedProductData.hasOwnProperty('stock')) {
+      updatedProduct.stockHistory.push({
+        stock: updatedProduct.stock,
+        date: new Date(),
+      });
+      updatedProduct.stock = updatedProductData.stock;
+    }
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
     res.json(updatedProduct);
   } catch (error) {
     if (error instanceof Error) {
@@ -68,36 +121,21 @@ router.delete('/:id', async (req: Request, res: Response) => {
 //  Search and filter products by specific criteria
 router.get('/search', async (req: Request, res: Response) => {
   try {
-    const { price, stock, name } = req.query;
+    const { stock, tags, name } = req.query;
     const filter: any = {};
 
-    if (price) {
-      const parsedPrice = parseFloat(price as string);
-      if (!isNaN(parsedPrice)) {
-        filter.price = { $lte: parsedPrice };
-      } else {
-        res.json([]);
-        return;
-      }
+    if (stock) {
+        filter.stock = { $lte: stock };
     }
 
-    if (stock) {
-      const parsedStock = parseFloat(stock as string);
-      if (!isNaN(parsedStock)) {
-        filter.stock = { $lte: parsedStock };
-      } else {
-        res.json([]);
-        return;
+    if (tags) {
+      const parsedTags = Array.isArray(tags) ? tags : [tags];
+      filter.tags = { $in: parsedTags };
       }
-    }
 
     if (name) {
       filter.name = { $regex: name as string, $options: 'i' };
-    } else {
-      res.json([]);
-      return;
     }
-
     const products = await Product.find(filter);
 
     res.json(products);
@@ -107,6 +145,5 @@ router.get('/search', async (req: Request, res: Response) => {
     }
   }
 });
-
 
 export default router;
