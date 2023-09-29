@@ -1,10 +1,10 @@
 # Backend-NodeJs-Rocketfy
 
-Este es un proyecto de ejemplo que utiliza Node.js con Express y MongoDB para crear una API que permite buscar y filtrar productos por diferentes criterios, como precio, stock y nombre.
+Este es un proyecto de ejemplo que utiliza Node.js con Express y MongoDB para crear una API que permite buscar y filtrar productos por diferentes criterios, como etiqueta, stock y nombre. Además de eso se paginan los productos, también se puede crear, editar, eliminar y actualizar cualquier producto.
 
 ## Requisitos previos
 
-Asegúrate de tener instalado Node.js y MongoDB en tu sistema antes de ejecutar este proyecto.
+Asegúrate de tener instalado Node.js y MongoDB en tu sistema antes de ejecutar este proyecto. El proyecto esta para ejecución en entorno local, puede utilizar Robo 3T para visualizar los datos de MongoDB.
 
 ## Configuración
 
@@ -23,7 +23,7 @@ Asegúrate de tener instalado Node.js y MongoDB en tu sistema antes de ejecutar 
     ```bash
    MONGODB_URI=mongodb://localhost/rocketfy
 
-4. Corre con:
+4. Corre el proyecto con:
 
    ```bash
     npm run build-node
